@@ -28,7 +28,7 @@ private:
 
         fish += grid[i][j];
 
-        grid[i][j] = -1; // Visited
+        grid[i][j] = -1; 
 
         for (const auto& dir : directions) {
             int nr = i + dir[0];
