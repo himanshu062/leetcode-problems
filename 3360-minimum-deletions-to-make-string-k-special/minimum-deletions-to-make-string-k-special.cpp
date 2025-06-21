@@ -1,41 +1,37 @@
-using namespace std;
-
 class Solution {
 public:
-    int minimumDeletions(const string& word, int k) {
-        array<int, 26> freq{};
-        for (unsigned char c : word)
-            ++freq[c - 'a'];
-
-        vector<int> freqList;
-        freqList.reserve(26);
-        for (int f : freq)
-            if (f > 0)
-                freqList.push_back(f);
-
-        sort(begin(freqList), end(freqList));
-
-        int n = freqList.size(), total = word.size(), removedLeft = 0,
-            inWindowSum = 0, best = INT_MAX, r = 0;
-
-        for (int l = 0; l < n; ++l) {
-            int base = freqList[l];
-            int limit = base + k;
-
-            while (r < n && freqList[r] <= limit)
-                inWindowSum += freqList[r++];
-
-            int rightCount = n - r;
-            int rightSum = total - inWindowSum;
-            int delRight = rightSum - rightCount * limit;
-
-            best = min(best, removedLeft + delRight);
-
-            total -= freqList[l];
-            removedLeft += freqList[l];
-            inWindowSum -= freqList[l];
+    int minimumDeletions(string word, int k) {
+        vector<int> count(26, 0);
+        for (char c : word) {
+            count[c - 'a']++;
+        }
+        vector<int> freqs;
+        for (int c : count) {
+            if (c > 0) {
+                freqs.push_back(c);
+            }
+        }
+        sort(freqs.begin(), freqs.end());
+        int n = freqs.size();
+        vector<int> prefix(n + 1, 0);
+        for (int i = 0; i < n; ++i) {
+            prefix[i + 1] = prefix[i] + freqs[i];
         }
 
-        return best;
+        int total = prefix[n];
+        int minDeletions = INT_MAX;
+        for (int i = 0; i < n; ++i) {
+            int target = freqs[i];
+            int maxAllowed = target + k;
+            int j = upper_bound(freqs.begin(), freqs.end(), maxAllowed) -
+                    freqs.begin();
+            int deleteBelow = prefix[i];
+            int deleteAbove = total - prefix[j] - (maxAllowed * (n - j));
+            int deletions = deleteBelow + deleteAbove;
+
+            minDeletions = min(minDeletions, deletions);
+        }
+
+        return minDeletions;
     }
 };
