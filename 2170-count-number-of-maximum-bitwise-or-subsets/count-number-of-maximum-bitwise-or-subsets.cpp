@@ -1,22 +1,24 @@
 class Solution {
 public:
     int countMaxOrSubsets(vector<int>& nums) {
-        const int ors = accumulate(nums.begin(), nums.end(), 0, bit_or<>());
-        int ans = 0;
-        dfs(nums, 0, 0, ors, ans);
-        return ans;
+        int maxOR = 0;
+        for (int num : nums) {
+            maxOR |= num;
+        }
+        return backtrack(nums, maxOR, 0, 0);
     }
 
 private:
-    void dfs(const vector<int>& nums, int i, int path, const int& ors,
-             int& ans) {
-        if (i == nums.size()) {
-            if (path == ors)
-                ++ans;
-            return;
+    int backtrack(vector<int>& nums, int maxOR, int index, int currentOR) {
+        if (index == nums.size()) {
+            return currentOR == maxOR ? 1 : 0;
         }
 
-        dfs(nums, i + 1, path, ors, ans);
-        dfs(nums, i + 1, path | nums[i], ors, ans);
+        if (currentOR == maxOR) {
+            return 1 << (nums.size() - index);
+        }
+
+        return backtrack(nums, maxOR, index + 1, currentOR | nums[index]) +
+               backtrack(nums, maxOR, index + 1, currentOR);
     }
 };
