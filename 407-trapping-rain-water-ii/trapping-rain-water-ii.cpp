@@ -1,7 +1,7 @@
 struct T {
     int i;
     int j;
-    int h; 
+    int h;
 };
 
 class Solution {
@@ -41,7 +41,7 @@ public:
                     continue;
                 if (heightMap[x][y] < h) {
                     ans += h - heightMap[x][y];
-                    minHeap.emplace(x, y, h); 
+                    minHeap.emplace(x, y, h);
                 } else {
                     minHeap.emplace(x, y, heightMap[x][y]);
                 }
