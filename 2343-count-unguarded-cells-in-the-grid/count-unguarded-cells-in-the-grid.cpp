@@ -1,33 +1,58 @@
 class Solution {
 public:
+    void dfs(int r, int c, string dir, vector<vector<int>>& vis,
+             map<pair<int, int>, int>& mp) {
+        int n = vis.size();
+        int m = vis[0].size();
+        if (r < 0 || c < 0 || r >= n || c >= m)
+            return;
+        if (mp.find({r, c}) != mp.end())
+            return;
+        else
+            vis[r][c] = 1;
+
+        if (dir == "r") {
+            dfs(r, c + 1, "r", vis, mp);
+        }
+        if (dir == "l") {
+            dfs(r, c - 1, "l", vis, mp);
+        }
+        if (dir == "u") {
+            dfs(r - 1, c, "u", vis, mp);
+        }
+        if (dir == "d") {
+            dfs(r + 1, c, "d", vis, mp);
+        }
+    }
     int countUnguarded(int m, int n, vector<vector<int>>& guards,
                        vector<vector<int>>& walls) {
-        int g[m][n];
-        memset(g, 0, sizeof(g));
-        for (auto& e : guards) {
-            g[e[0]][e[1]] = 2;
+        vector<vector<int>> vis(m, vector<int>(n));
+        queue<pair<int, int>> q;
+        map<pair<int, int>, int> mp;
+        for (auto it : guards) {
+            q.push({it[0], it[1]});
+            mp[{it[0], it[1]}]++;
+            vis[it[0]][it[1]] = 1;
         }
-        for (auto& e : walls) {
-            g[e[0]][e[1]] = 2;
+        for (auto it : walls) {
+            mp[{it[0], it[1]}]++;
+            vis[it[0]][it[1]] = 1;
         }
-        int dirs[5] = {-1, 0, 1, 0, -1};
-        for (auto& e : guards) {
-            for (int k = 0; k < 4; ++k) {
-                int x = e[0], y = e[1];
-                int dx = dirs[k], dy = dirs[k + 1];
-                while (x + dx >= 0 && x + dx < m && y + dy >= 0 && y + dy < n &&
-                       g[x + dx][y + dy] < 2) {
-                    x += dx;
-                    y += dy;
-                    g[x][y] = 1;
-                }
+        for (auto it : guards) {
+            int r = it[0];
+            int c = it[1];
+            dfs(r, c + 1, "r", vis, mp);
+            dfs(r, c - 1, "l", vis, mp);
+            dfs(r + 1, c, "d", vis, mp);
+            dfs(r - 1, c, "u", vis, mp);
+        }
+        int cnt = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (vis[i][j] == 0)
+                    cnt++;
             }
         }
-        int unguardedCount = 0;
-        for (int i = 0; i < m; i++) {
-            unguardedCount += count(g[i], g[i] + n, 0);
-        }
-
-        return unguardedCount;
+        return cnt;
     }
 };
